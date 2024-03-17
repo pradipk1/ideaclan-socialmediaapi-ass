@@ -12,48 +12,42 @@ const authRouter = require('./routes/auth');
 const postRouter = require('./routes/post');
 
 
-
+const apolloServer = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }) => {
+        // Extract token from request headers
+        const token = req.headers.authorization || '';
+        // Pass token in the context object
+        return { token };
+    }
+});
 const app = express();
+
 
 app.use(express.json());
 app.use(cors());
 
-
-
-// async function startServer() {
-//     const app = express();
-//     const apolloServer = new ApolloServer({
-//         typeDefs,
-//         resolvers,
-//     });
-
-//     await apolloServer.start();
-
-//     apolloServer.applyMiddleware({app: app});
-
-//     app.use((req, res) => {
-//         res.send("Hello from espress apollo server");
-//     })
-
-//     app.listen(8000, () => console.log("Server is running on port 8000"));
-// }
-
-
-app.get('/', (req, res, next) => {
-
-    res.send('Hello there');
-
-    next();
-});
-
-app.use('/auth', authRouter);
-app.use('/post', postRouter);
+async function startApolloServer() {
+    await apolloServer.start();
+    apolloServer.applyMiddleware({ app });
+}
 
 
 
 connectDatabase().then(() => {
-    // startServer();
-    app.listen(config.PORT, () => {
-        console.log(`Server listening to http requests on http://localhost:${config.PORT}`);
+
+    startApolloServer().then(() => {
+        app.get('/', (req, res) => {
+            res.send('Hello from Express!');
+        });
+
+        app.use('/auth', authRouter);
+        app.use('/post', postRouter);
+
+        app.listen(config.PORT, () => {
+            console.log(`Server listening to http requests on http://localhost:${config.PORT}`);
+        });
     });
-})
+
+});
