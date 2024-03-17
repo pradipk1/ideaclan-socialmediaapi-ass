@@ -34,6 +34,7 @@ async function startApolloServer() {
 }
 
 
+const port = config.PORT || 4000;
 
 connectDatabase().then(() => {
 
@@ -45,8 +46,8 @@ connectDatabase().then(() => {
         app.use('/auth', authRouter);
         app.use('/post', postRouter);
 
-        app.listen(config.PORT, () => {
-            console.log(`Server listening to http requests on http://localhost:${config.PORT}`);
+        app.listen(port, () => {
+            console.log(`Server listening to http requests on http://localhost:${port}`);
         });
     });
 
