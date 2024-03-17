@@ -31,6 +31,9 @@ app.use(cors());
 async function startApolloServer() {
     await apolloServer.start();
     apolloServer.applyMiddleware({ app });
+    app.post('/graphql', (req, res, next) => {
+        next();
+    });
 }
 
 
@@ -45,6 +48,7 @@ connectDatabase().then(() => {
 
         app.use('/auth', authRouter);
         app.use('/post', postRouter);
+        
 
         app.listen(port, () => {
             console.log(`Server listening to http requests on http://localhost:${port}`);
